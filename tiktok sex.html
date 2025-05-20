@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>TikTok URL双方向変換ツール</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    #outputUrl {
+      color: green;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    li {
+      background: #f4f4f4;
+      margin: 5px 0;
+      padding: 8px;
+      border-left: 5px solid #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <h1>TikTok URL双方向変換ツール</h1>
+  <p>
+    入力されたURLを自動的に<br>
+    <strong>vt.tiktok.com ⇄ lite.tiktok.com</strong> に変換します。履歴も保存されます。
+  </p>
+
+  <input type="text" id="inputUrl" placeholder="https://vt.tiktok.com/xxxxx または lite.tiktok.com">
+  <button onclick="convertUrl()">変換する</button>
+
+  <p>変換後のURL：</p>
+  <input type="text" id="outputUrl" readonly>
+  <button onclick="copyOutput()">コピーする</button>
+
+  <h2>変換履歴</h2>
+  <ul id="historyList"></ul>
+
+  <script>
+    function convertUrl() {
+      let input = document.getElementById("inputUrl").value.trim();
+      if (!input) return;
+
+      let output = input;
+
+      if (/vt\.tiktok\.com/i.test(input)) {
+        output = input.replace(/https?:\/\/(www\.)?vt\.tiktok\.com/gi, "https://lite.tiktok.com")
+                      .replace(/vt\.tiktok\.com/gi, "lite.tiktok.com");
+      } else if (/lite\.tiktok\.com/i.test(input)) {
+        output = input.replace(/https?:\/\/(www\.)?lite\.tiktok\.com/gi, "https://vt.tiktok.com")
+                      .replace(/lite\.tiktok\.com/gi, "vt.tiktok.com");
+      } else {
+        alert("有効な TikTok URL を入力してください。");
+        return;
+      }
+
+      document.getElementById("outputUrl").value = output;
+      addToHistory(output);
+    }
+
+    function copyOutput() {
+      let output = document.getElementById("outputUrl");
+      output.select();
+      document.execCommand("copy");
+      alert("コピーしました: " + output.value);
+    }
+
+    function addToHistory(url) {
+      let history = getHistory();
+      if (!history.includes(url)) {
+        history.unshift(url);
+        if (history.length > 10) history = history.slice(0, 10);
+        document.cookie = "history=" + encodeURIComponent(JSON.stringify(history)) + "; path=/";
+        renderHistory(history);
+      }
+    }
+
+    function getHistory() {
+      let match = document.cookie.match(/(?:^|; )history=([^;]*)/);
+      if (match) {
+        try {
+          return JSON.parse(decodeURIComponent(match[1]));
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    }
+
+    function renderHistory(history) {
+      let list = document.getElementById("historyList");
+      list.innerHTML = "";
+      history.forEach(url => {
+        let li = document.createElement("li");
+        li.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+        list.appendChild(li);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderHistory(getHistory());
+    });
+  </script>
+</body>
+</html>
