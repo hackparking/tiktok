@@ -35,10 +35,10 @@
   <h1>TikTok URL双方向変換ツール</h1>
   <p>
     入力されたURLを自動的に<br>
-    <strong>vt.tiktok.com ⇄ lite.tiktok.com</strong> に変換します。履歴も保存されます。
+    <strong>vt.tiktok.com ⇄ lite.tiktok.com/t/</strong> に変換します。履歴も保存されます。
   </p>
 
-  <input type="text" id="inputUrl" placeholder="https://vt.tiktok.com/xxxxx または lite.tiktok.com">
+  <input type="text" id="inputUrl" placeholder="https://vt.tiktok.com/xxxxx または https://lite.tiktok.com/t/xxxxx">
   <button onclick="convertUrl()">変換する</button>
 
   <p>変換後のURL：</p>
@@ -56,11 +56,10 @@
       let output = input;
 
       if (/vt\.tiktok\.com/i.test(input)) {
-        output = input.replace(/https?:\/\/(www\.)?vt\.tiktok\.com/gi, "https://lite.tiktok.com")
-                      .replace(/vt\.tiktok\.com/gi, "lite.tiktok.com");
-      } else if (/lite\.tiktok\.com/i.test(input)) {
-        output = input.replace(/https?:\/\/(www\.)?lite\.tiktok\.com/gi, "https://vt.tiktok.com")
-                      .replace(/lite\.tiktok\.com/gi, "vt.tiktok.com");
+        output = input.replace(/https?:\/\/(www\.)?vt\.tiktok\.com/gi, "https://lite.tiktok.com/t");
+      } else if (/lite\.tiktok\.com(\/t)?/i.test(input)) {
+        output = input.replace(/https?:\/\/(www\.)?lite\.tiktok\.com\/t/gi, "https://vt.tiktok.com")
+                      .replace(/https?:\/\/(www\.)?lite\.tiktok\.com/gi, "https://vt.tiktok.com");
       } else {
         alert("有効な TikTok URL を入力してください。");
         return;
